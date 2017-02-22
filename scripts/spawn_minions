@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(dirname $0)"
+source $SCRIPT_DIR/common
+
+fetch_repo 'https://gitlab.suse.de/docker/k8s-terraform.git' master $TERRAFORM_DIR
+
+cd $TERRAFORM_DIR
+default_interface=$(awk '$2 == 00000000 { print $1 }' /proc/net/route)
+ip_address=$(ip addr show $default_interface | awk '$1 == "inet" {print $2}' | cut -f1 -d/)
+
+DASHBOARD_HOST=$ip_address SKIP_DASHBOARD=1 FLAVOUR=opensuse MINIONS_SIZE=$1 contrib/libvirt/k8s-libvirt.sh apply

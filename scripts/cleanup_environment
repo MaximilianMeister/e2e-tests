@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(dirname $0)"
+source $SCRIPT_DIR/common
+
+cd $VELUM_DIR/kubernetes
+./cleanup
+cd $SCRIPT_DIR
+./stop_kubelet

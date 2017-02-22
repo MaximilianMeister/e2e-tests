@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(dirname $0)"
+source $SCRIPT_DIR/common
+
+cd $TERRAFORM_DIR
+FORCE=true contrib/libvirt/k8s-libvirt.sh destroy
+
+# Manual cleanup (because sometimes the above leaves garbage behind)
+sudo -v # Get sudo access
+
+# Remove domains
+sudo virsh list --all | tail -n +3 | awk '{print $2}' | while read domain
+do
+  if [[ ! -z "${domain//}" ]]
+  then
+    log "Cleaning up domain: "$domain
+    sudo virsh destroy $domain
+    sudo virsh undefine $domain
+  fi
+done
+
+# Remove volumes
+sudo virsh vol-list default | tail -n +3 | awk '{print $2}' | while read volume
+do
+  if [[ ! -z "${volume//}" ]]
+  then
+    log "Cleaning up volume: "$volume
+    sudo virsh vol-delete $volume
+  fi
+done
+
+# Remove networks
+sudo virsh net-list --all | tail -n +3 | awk '{print $1}' | while read network
+do
+  if [[ ! -z "${network//}" ]] && [ $network != "default" ]
+  then
+    log "Cleaning up volume: "$network
+    sudo virsh net-destroy $network
+    sudo virsh net-undefine $network
+  fi
+done
+
+# Remove generated tf and tfstate files
+rm terraform.tfstate
+rm terraform.tfstate.backup
+rm k8s-setup.tf

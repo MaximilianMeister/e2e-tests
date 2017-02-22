@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(dirname $0)"
+source $SCRIPT_DIR/common
+
+cd $TERRAFORM_DIR
+
+terraform show -no-color | tail -n 1 | awk '{print $3}'

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(dirname $0)"
+source $SCRIPT_DIR/common
+
+cd $TERRAFORM_DIR
+
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ssh/id_docker root@$1 $2 2> /dev/null # Ignore the Wargning

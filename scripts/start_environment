@@ -1,29 +1,9 @@
 #!/usr/bin/env bash
 
-log()   { echo ">>> $1" ; }
-
-SALT_DIR=$PWD/k8s-salt
-TERRAFORM_DIR=$PWD/k8s-terraform
-VELUM_DIR=$PWD/velum
-ROOT_DIRECTORY=$PWD
-
-# Usage: fetch_repo "my_repo_url", "dir_name"
-fetch_repo() {
-  log 'Fetching '$1
-
-  new_dir="$PWD/$3"
-  old_dir=$PWD
-  mkdir $3
-  cd $3
-  git init
-  git remote add origin $1
-  git fetch origin
-  git reset --hard origin/$2
-  cd $old_dir
-}
+SCRIPT_DIR="$(dirname $0)"
+source $SCRIPT_DIR/common
 
 fetch_repo 'https://gitlab.suse.de/docker/k8s-salt.git' master $SALT_DIR
-fetch_repo 'https://gitlab.suse.de/docker/k8s-terraform.git' master $TERRAFORM_DIR
 fetch_repo 'https://github.com/kubic-project/velum.git' master $VELUM_DIR
 
 # Spawn the velum "development" environment (dashboard, salt-master,
@@ -34,7 +14,7 @@ cd $VELUM_DIR/kubernetes
 ./cleanup
 # Daemonize this and loop until its ready
 SALT_DIR=$SALT_DIR ./start --non-interactive &
-cd $ROOT_DIRECTORY
+cd $ROOT_DIR
 
 # Wait until the dashboard is up and running
 until $(curl -s http://127.0.0.1:3000/ | grep -q "Log in")
@@ -46,6 +26,6 @@ done
 # Stop the kubelet when containers are up and running
 # or else we won't be able to launch another instance with the next script
 # invocation.
-$PWD/scripts/stop_kubelet
+$SCRIPT_DIR/stop_kubelet
 
 exit 0;
