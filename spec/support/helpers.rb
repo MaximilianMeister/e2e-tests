@@ -71,6 +71,22 @@ module Helpers
       duration: Time.now - start_time_at }
   end
 
+  # This method can be used to wait for something to happen.
+  # E.g. Wait for a record to appear in the velum-dashboard database.
+  # timeout is the number of seconds before the loop is exited
+  # inteval is the number of seconds to wait before next invocation of the block
+  # block is the code that must return true to exit the loop
+  #
+  # The method return false if the timeout is reached or the block never returns
+  # true.
+  def loop_with_timeout(timeout:, interval: 1, &block)
+    start_time = Time.now
+    loop do
+      return false if Time.now - start_time > timeout
+      return true if yield
+    end
+  end
+
   private
 
   # This returns the server's host in tests with "js: true"

@@ -1,4 +1,5 @@
 require 'yaml'
+require_relative "helpers"
 
 # This class is used to access the spawned minions and run commands in them.
 # It also provides methods that act as helpers to assertions for tests.
@@ -33,7 +34,7 @@ class Minion
   # Run a command inside the minions. We use ssh to run commands.
   # Returns the output of the command.
   def command(cmd, verbose: false)
-    cmd_string = "#{File.join(self.class.scripts_path, "command")} #{ip} '#{cmd}'"
+    cmd_string = "#{File.join(self.class.scripts_path, "minion_command")} #{ip} '#{cmd}'"
     self.class.system_command(command: cmd_string, verbose: verbose)
   end
 

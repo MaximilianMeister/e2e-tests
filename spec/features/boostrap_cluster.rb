@@ -20,8 +20,32 @@ feature "Boostrap cluster" do
 
   scenario "it runs creates a kubernetes cluster" do
     visit "/nodes/index"
+
+    dashboard_container = Container.new("velum-dashboard")
+
+    # Wait until Minions are registered
+    command = "rails runner 'ActiveRecord::Base.logger=nil; Minion.count'"
+    loop_with_timeout(timeout: 15, interval: 1) do
+      dashboard_container.command(command)[:stdout].to_i == 2
+    end
+
+    # They should also appear in the UI
     expect(page).to have_content('minion0.k8s.local')
+    expect(page).to have_content('minion1.k8s.local')
+
     click_on 'Bootstrap cluster'
+
+    # Wait until orchestration is complete
+    query = "Minion.where(highstate: [Minion.highstates[:applied], Minion.highstates[:failed]]).count"
+    command = "rails runner 'ActiveRecord::Base.logger=nil; #{query}'"
+    loop_with_timeout(timeout: 15, interval: 1) do
+      dashboard_container.command(command)[:stdout].to_i == 2
+    end
+
+    # All Minions should have been applied the highstate successfully
+    query = "Minion.where(highstate: Minion.highstates[:applied]).count"
+    command = "rails runner 'ActiveRecord::Base.logger=nil; #{query}'"
+    expect(dashboard_container.command(command)[:stdout].to_i).to eq(2)
 
     minions = Minion.all
     applied_roles = minions.map(&:roles).flatten
