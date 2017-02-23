@@ -55,7 +55,7 @@ feature "Boostrap cluster" do
 
     # The pause image is there.
     found = false
-    info["items"].first["status"]["images"].each do |images|
+    nodes["items"].first["status"]["images"].each do |images|
       images["names"].each { |name| found = true if name == "suse/pause:latest" }
     end
     expect(found).to be_truthy
