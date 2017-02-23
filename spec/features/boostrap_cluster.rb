@@ -58,6 +58,7 @@ feature "Boostrap cluster" do
     info["items"].first["status"]["images"].each do |images|
       images["names"].each { |name| found = true if name == "suse/pause:latest" }
     end
+    expect(found).to be_truthy
 
     # Now let's check for etcd
 
