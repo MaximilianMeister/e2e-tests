@@ -32,9 +32,9 @@ class Minion
 
   # Run a command inside the minions. We use ssh to run commands.
   # Returns the output of the command.
-  def command(cmd)
+  def command(cmd, verbose: false)
     cmd_string = "#{File.join(self.class.scripts_path, "command")} #{ip} '#{cmd}'"
-    self.class.system_command(command: cmd_string)
+    self.class.system_command(command: cmd_string, verbose: verbose)
   end
 
   # Returns true if the given program is running inside of this minion, false

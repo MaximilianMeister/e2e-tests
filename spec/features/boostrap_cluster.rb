@@ -25,7 +25,7 @@ feature "Boostrap cluster" do
 
     minions = Minion.all
     applied_roles = minions.map(&:roles).flatten
-    expect(applied_roles.sort).to eq("master", "minion")
+    expect(applied_roles.sort).to eq(["kube-master", "kube-minion"])
 
     if minions.first.roles.first == "kube-master"
       master, minion = minions
