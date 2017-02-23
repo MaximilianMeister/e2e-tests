@@ -26,12 +26,14 @@ class Minion
 
   # Returns the roles of this Minion
   def roles
-    YAML.load(command("salt-call grains.get roles"))["local"]
+    result = command("salt-call grains.get roles")
+    YAML.load(result[:stdout])["local"]
   end
 
   # Run a command inside the minions. We use ssh to run commands.
   # Returns the output of the command.
   def command(cmd)
-    `#{File.join(self.class.scripts_path, "command")} #{ip} "#{cmd}"`
+    cmd_string = "#{File.join(self.class.scripts_path, "command")} #{ip} '#{cmd}'"
+    self.class.system_command(command: cmd_string)
   end
 end

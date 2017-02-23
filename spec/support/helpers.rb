@@ -52,6 +52,8 @@ module Helpers
         end
       end
 
+      exit_code = thread.value.exitstatus
+
       # The main thread (the command) is done so any commands binding the stdout
       # or stderr should not prevent this method from returning.
       # Give a fair timeout in case there is some last data on a stream which
@@ -61,8 +63,6 @@ module Helpers
       rescue Timeout::Error
         threads.each(&:exit)
       end
-
-      exit_code = thread.value.exitstatus
     end
 
     { stdout: stdout_data.strip,
