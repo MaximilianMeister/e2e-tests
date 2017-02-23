@@ -19,8 +19,31 @@ cd $ROOT_DIR
 # Wait until the dashboard is up and running
 until $(curl -s http://127.0.0.1:3000/ | grep -q "Log in")
 do
-  log "Waiting for testing environment to be ready"
+  log "Waiting for velum to start"
   sleep 5
+done
+
+# Wait until even processor is up and running
+started=false
+until $started
+do
+  log "Waiting for event processor to start"
+
+  event_processor_id=$(docker ps | grep event-processor | awk '{print $1}')
+  if [ -z $event_processor_id ]
+  then
+    sleep 5
+    break
+  fi
+
+  # found container. Lets see if it is running UPDATE queries (or else failing).
+  if [ $(docker logs $event_processor_id | grep UPDATE | wc -l) -gt 1 ]
+  then
+    started=true
+  else
+    sleep 5
+    break
+  fi
 done
 
 # Stop the kubelet when containers are up and running
