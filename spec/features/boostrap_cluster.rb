@@ -46,11 +46,11 @@ feature "Boostrap cluster" do
     ##
     # Sanity checks on the Kubernetes cluster.
 
-    out = master.command("kubectl cluster-info dump --output-directory=/opt/info")
+    out = master.command("kubectl cluster-info dump --output-directory=/opt/info")[:stdout]
     expect(out).to eq "Cluster info dumped to /opt/info"
 
     # One minion named minion0
-    nodes = JSON.parse("cat /opt/info/nodes.json")
+    nodes = JSON.parse(master.command("cat /opt/info/nodes.json")[:stdout])
     expect(nodes["items"].first["metadata"]["name"]).to eq "minion0"
 
     # The pause image is there.
@@ -65,7 +65,7 @@ feature "Boostrap cluster" do
     flags = '--key-file=/etc/pki/minion.key --cert-file=/etc/pki/minion.crt ' \
             '--ca-file=/var/lib/k8s-ca-certificates/cluster_ca.crt ' \
             '--endpoints="https://minion1.k8s.local:2379,https://minion0.k8s.local:2379"'
-    out = master.command("etcdctl #{flags} cluster-health")
+    out = master.command("etcdctl #{flags} cluster-health")[:stdout]
     expect(out.include?("got healthy result")).to be_truthy
   end
 end

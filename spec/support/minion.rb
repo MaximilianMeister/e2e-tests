@@ -40,6 +40,6 @@ class Minion
   # Returns true if the given program is running inside of this minion, false
   # otherwise.
   def running?(name)
-    !command("pgrep #{name}").strip.match(/^\d+$/).nil?
+    !command("pgrep #{name}")[:stdout].strip.match(/^\d+$/).nil?
   end
 end
