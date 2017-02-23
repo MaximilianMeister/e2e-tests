@@ -26,7 +26,7 @@ class Minion
 
   # Returns the roles of this Minion
   def roles
-    result = command(command: "salt-call grains.get roles")
+    result = command("salt-call grains.get roles")
     YAML.load(result[:stdout])["local"]
   end
 
