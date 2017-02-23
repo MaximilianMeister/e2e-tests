@@ -36,4 +36,10 @@ class Minion
     cmd_string = "#{File.join(self.class.scripts_path, "command")} #{ip} '#{cmd}'"
     self.class.system_command(command: cmd_string)
   end
+
+  # Returns true if the given program is running inside of this minion, false
+  # otherwise.
+  def running?(name)
+    !command("pgrep #{name}").strip.match(/^\d+$/).nil?
+  end
 end

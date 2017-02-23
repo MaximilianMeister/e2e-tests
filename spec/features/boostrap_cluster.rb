@@ -26,6 +26,45 @@ feature "Boostrap cluster" do
     minions = Minion.all
     applied_roles = minions.map(&:roles).flatten
     expect(applied_roles.sort).to eq("master", "minion")
-    # TODO: we need assertions for successful orchestration
+
+    if minions.first.roles.first == "kube-master"
+      master, minion = minions
+    else
+      minion, master = minions
+    end
+
+    # Check that the expected programs are running on each node.
+
+    ["etcd", "salt-minion", "kube-apiserver", "kube-scheduler", "kube-controller"]. each do |p|
+      expect(master.running?(p)).to be_truthy
+    end
+
+    ["etcd", "salt-minion", "flannel", "docker", "containerd", "kube-proxy", "kubelet"]. each do |p|
+      expect(minion.running?(p)).to be_truthy
+    end
+
+    ##
+    # Sanity checks on the Kubernetes cluster.
+
+    out = master.command("kubectl cluster-info dump --output-directory=/opt/info")
+    expect(out).to eq "Cluster info dumped to /opt/info"
+
+    # One minion named minion0
+    nodes = JSON.parse("cat /opt/info/nodes.json")
+    expect(nodes["items"].first["metadata"]["name"]).to eq "minion0"
+
+    # The pause image is there.
+    found = false
+    info["items"].first["status"]["images"].each do |images|
+      images["names"].each { |name| found = true if name == "suse/pause:latest" }
+    end
+
+    # Now let's check for etcd
+
+    flags = '--key-file=/etc/pki/minion.key --cert-file=/etc/pki/minion.crt ' \
+            '--ca-file=/var/lib/k8s-ca-certificates/cluster_ca.crt ' \
+            '--endpoints="https://minion1.k8s.local:2379,https://minion0.k8s.local:2379"'
+    out = master.command("etcdctl #{flags} cluster-health")
+    expect(out.include?("got healthy result")).to be_truthy
   end
 end
