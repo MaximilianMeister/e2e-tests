@@ -1,24 +1,29 @@
-# frozen_string_literal: true
 # A module containing helper methods to create a testing environment
 # for end to end tests.
 module Helpers
   # Spawns salt-minions which connect to velum.
   # The minion is a Virtual Machine which we build using terraform.
-  def spawn_minions(number_of_minions)
-    `#{File.join(scripts_path, "spawn_minions")} #{number_of_minions.to_i}`
+  def spawn_minions(number_of_minions, verbose: false)
+    system_command(
+      command: "#{File.join(scripts_path, "spawn_minions")} #{number_of_minions.to_i}",
+      verbose: verbose
+    )
   end
 
-  def cleanup_minions
-    `#{File.join(scripts_path, "cleanup_minions")}`
+  def cleanup_minions(verbose: false)
+    system_command(command: "#{File.join(scripts_path, "cleanup_minions")}", verbose: verbose)
   end
 
   # Runs the script that creates the testing environment
-  def start_environment
-    `#{File.join(scripts_path, "start_environment")}`
+  def start_environment(verbose: false)
+    system_command(command: "#{File.join(scripts_path, "start_environment")}", verbose: verbose)
   end
 
-  def cleanup_environment
-    `#{File.join(scripts_path, "cleanup_environment")}`
+  def cleanup_environment(verbose: false)
+    system_command(
+      command: "#{File.join(scripts_path, "cleanup_environment")}",
+      verbose: verbose
+    )
   end
 
   def scripts_path
@@ -26,6 +31,44 @@ module Helpers
       File.dirname(File.dirname(File.dirname(__FILE__))),
       "scripts",
     )
+  end
+
+  # https://nickcharlton.net/posts/ruby-subprocesses-with-stdout-stderr-streams.html
+  # see: http://stackoverflow.com/a/1162850/83386
+  def system_command(command:, verbose: false)
+    start_time_at = Time.now
+    stdout_data = ''
+    stderr_data = ''
+    exit_code = nil
+    threads = []
+
+    Open3.popen3(command) do |stdin, stdout, stderr, thread|
+      [[stdout_data, stdout], [stderr_data, stderr]].each do |store_var, stream|
+        threads << Thread.new do
+          until (line = stream.gets).nil? do
+            store_var << line # append new lines
+            (verbose || ENV["VERBOSE"]) && puts(line)
+          end
+        end
+      end
+
+      # The main thread (the command) is done so any commands binding the stdout
+      # or stderr should not prevent this method from returning.
+      # Give a fair timeout in case there is some last data on a stream which
+      # the thread did not have the time to read.
+      begin
+        Timeout::timeout(1) { threads.map(&:join) }
+      rescue Timeout::Error
+        threads.each(&:exit)
+      end
+
+      exit_code = thread.value.exitstatus
+    end
+
+    { stdout: stdout_data.strip,
+      stderr: stderr_data.strip,
+      exit_code: exit_code,
+      duration: Time.now - start_time_at }
   end
 
   private

@@ -28,6 +28,13 @@ After the tests are done there should be:
 - no kubelet process running
 - no docker containers left running (only refers to those we spawned)
 
+## Output
+
+You can enable verbose output by setting the `VERBOSE` env variable.
+E.g.  `VERBOSE=true rspec spec/**/*`
+
+When you do, all the output from scripts will be output. Use this for debugging.
+
 ## TODO:
 
 - The script that starts the kubelet (velum/kubernetes/start) and the script
