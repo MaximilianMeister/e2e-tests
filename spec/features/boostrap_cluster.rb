@@ -37,14 +37,14 @@ feature "Boostrap cluster" do
 
     # Wait until orchestration is complete
     query = "Minion.where(highstate: [Minion.highstates[:applied], Minion.highstates[:failed]]).count"
-    command = "rails runner 'ActiveRecord::Base.logger=nil; #{query}'"
+    command = "rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
     loop_with_timeout(timeout: 15, interval: 1) do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
 
     # All Minions should have been applied the highstate successfully
     query = "Minion.where(highstate: Minion.highstates[:applied]).count"
-    command = "rails runner 'ActiveRecord::Base.logger=nil; #{query}'"
+    command = "rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
     expect(dashboard_container.command(command)[:stdout].to_i).to eq(2)
 
     minions = Minion.all
