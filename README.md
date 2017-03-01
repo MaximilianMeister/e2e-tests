@@ -28,6 +28,35 @@ After the tests are done there should be:
 - no kubelet process running
 - no docker containers left running (only refers to those we spawned)
 
+### Specifying branches
+
+For the end to end testing 3 git repositories are pulled:
+
+- [velum](https://github.com/kubic-project/velum)
+- [k8s-salt](https://github.com/kubic-project/salt)
+- [k8s-terraform](https://github.com/kubic-project/terraform)
+
+Sometimes we need to specify a spefic branch for each one of them. That can be
+achieved by specifying the following environment variables:
+
+- VELUM_BRANCH: branch to use for velum
+- TERRAFORM_BRANCH: branch to use for k8s-terraform
+- SALT_BRANCH: branch to use for k8s-salt
+
+You can also define the branch through the sinatra api `/start` endpoint:
+
+```
+curl -X POST http://localhost:4567/start --data "velum-branch=ui-integration"
+```
+
+or (for a pull request)
+
+```
+curl -X POST http://localhost:4567/start --data "velum-branch=pull/56/head"
+```
+
+The available params are salt-branch, velum-branch and terraform-branch.
+
 ## Output
 
 You can enable verbose output by setting the `VERBOSE` env variable.

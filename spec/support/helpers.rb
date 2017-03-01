@@ -42,7 +42,7 @@ module Helpers
     exit_code = nil
     threads = []
 
-    Open3.popen3(command) do |stdin, stdout, stderr, thread|
+    Open3.popen3(ENV, command) do |stdin, stdout, stderr, thread|
       [[stdout_data, stdout], [stderr_data, stderr]].each do |store_var, stream|
         threads << Thread.new do
           until (line = stream.gets).nil? do

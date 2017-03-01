@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
 
+# When SALT_BRANCH or VELUM_BRANCH environment variables are defined, they are
+# used as the branch to pull from k8s-salt and velum upstream repositories
+# accordingly. If they are not defined we use "master" by default.
+
 SCRIPT_DIR="$(dirname $0)"
 source $SCRIPT_DIR/common
 
-fetch_repo 'https://gitlab.suse.de/docker/k8s-salt.git' master $SALT_DIR
-fetch_repo 'https://github.com/kubic-project/velum.git' master $VELUM_DIR
+if [ -z "${SALT_BRANCH+x}" ]; then
+  salt_branch=master
+else
+  salt_branch=$SALT_BRANCH
+fi
+
+if [ -z "${VELUM_BRANCH+x}" ]; then
+  velum_branch=master
+else
+  velum_branch=$VELUM_BRANCH
+fi
+
+fetch_repo 'https://github.com/kubic-project/salt.git' $salt_branch $SALT_DIR
+fetch_repo 'https://github.com/kubic-project/velum.git' $velum_branch $VELUM_DIR
 
 # Spawn the velum "development" environment (dashboard, salt-master,
 # salt-api, ca, etcd)
