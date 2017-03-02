@@ -20,7 +20,7 @@ class RspecResultApi < Sinatra::Base
     def run!
       Thread.new do
         Dir.chdir(settings.root) do
-          `bundle exec rspec --format json -o e2e-result.json spec/**/* >/dev/null 2>&1`
+          `VERBOSE=true bundle exec rspec --format json -o e2e-result.json spec/**/* 2>&1 | tee e2e-tests.log`
         end
       end
     end
