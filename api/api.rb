@@ -13,6 +13,10 @@ class RspecResultApi < Sinatra::Base
       Pathname.new(settings.root).join("e2e-result.json")
     end
 
+    def log_path
+      Pathname.new(settings.root).join("e2e-tests.log")
+    end
+
     def json_result
       JSON.parse(result_file_path.read)
     end
@@ -51,6 +55,14 @@ class RspecResultApi < Sinatra::Base
       running: (result_file_path.size.zero? rescue false), # when file doesn't exist initially
       success: (json_result["summary"]["failure_count"].zero? rescue false) # when file is empty
     )
+  end
+
+  get "/logs" do
+    if log_path.exist?
+      send_file log_path
+    else
+      status 404
+    end
   end
 
   run! if app_file == $0
