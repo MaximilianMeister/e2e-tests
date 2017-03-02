@@ -17,18 +17,25 @@ class RspecResultApi < Sinatra::Base
       JSON.parse(result_file_path.read)
     end
 
-    def run!
+    def run!(env_vars={})
+      env_vars.merge!({"VERBOSE" => "true"})
+      env_var_str = env_vars.map{|name,value| value != "" ? "#{name}=#{value}" : nil}.join(" ")
       Thread.new do
         Dir.chdir(settings.root) do
-          `VERBOSE=true bundle exec rspec --format json -o e2e-result.json spec/**/* 2>&1 | tee e2e-tests.log`
+          `#{env_var_str} bundle exec rspec --format json -o e2e-result.json spec/**/* 2>&1 | tee e2e-tests.log`
         end
       end
     end
   end
 
   post '/start' do
+    env_vars = {}
+    env_vars["SALT_BRANCH"] = params["salt-branch"]
+    env_vars["VELUM_BRANCH"] = params["velum-branch"]
+    env_vars["TERRAFORM_BRANCH"] = params["terraform-branch"]
+
     # if the json file doesn't exist initially
-    run! && return unless result_file_path.exist?
+    run!(env_vars) && return unless result_file_path.exist?
     # return temporary unavailable if test is already running
     result_file_path.size.zero? ? (status 503) : run!
   end

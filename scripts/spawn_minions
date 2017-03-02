@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 
+# The first argument in this script is the number of minions to spawn.
+# When TERRAFORM_BRANCH environment variable is defined, it is used as the
+# branch to pull from k8s-terraform upstream repository. If is is not defined
+# we use "master" by default.
+
 SCRIPT_DIR="$(dirname $0)"
 source $SCRIPT_DIR/common
 
-fetch_repo 'https://gitlab.suse.de/docker/k8s-terraform.git' master $TERRAFORM_DIR
+if [ -z "${TERRAFORM_BRANCH+x}" ]; then
+  branch=master
+else
+  branch=$TERRAFORM_BRANCH
+fi
+
+fetch_repo 'https://github.com/kubic-project/terraform.git' $branch $TERRAFORM_DIR
 
 cd $TERRAFORM_DIR
 default_interface=$(awk '$2 == 00000000 { print $1 }' /proc/net/route)

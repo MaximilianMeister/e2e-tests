@@ -11,7 +11,7 @@ VELUM_DIR=$ROOT_DIR/velum
 
 log()   { echo ">>> $1" ; }
 
-# Usage: fetch_repo "my_repo_url", commit_or_branch, "dir_name"
+# Usage: fetch_repo "my_repo_url", branch, "dir_name"
 fetch_repo() {
   log 'Fetching '$1
 
@@ -20,7 +20,7 @@ fetch_repo() {
   cd $3
   git init
   git remote add origin $1
-  git fetch origin
-  git reset --hard origin/$2
+  git fetch origin $2
+  git reset --hard FETCH_HEAD
   cd $ROOT_DIR
 }
