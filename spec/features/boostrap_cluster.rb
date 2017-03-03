@@ -90,9 +90,7 @@ feature "Boostrap cluster" do
     # expect(found).to be_truthy
 
     # Now let's check for etcd
-    flags = '--key-file=/etc/pki/minion.key --cert-file=/etc/pki/minion.crt ' \
-            '--ca-file=/var/lib/k8s-ca-certificates/cluster_ca.crt ' \
-            '--endpoints="https://minion1.k8s.local:2379,https://minion0.k8s.local:2379"'
+    flags = '--endpoints="http://minion1.k8s.local:2379,http://minion0.k8s.local:2379"'
     out = master.command("etcdctl #{flags} cluster-health")[:stdout]
     expect(out.include?("got healthy result")).to be_truthy
   end
