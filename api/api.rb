@@ -22,12 +22,15 @@ class RspecResultApi < Sinatra::Base
     end
 
     def run!(env_vars={})
-      env_vars.merge!({"VERBOSE" => "true"})
-      env_var_str = env_vars.map{|name,value| value != "" ? "#{name}=#{value}" : nil}.join(" ")
-      Thread.new do
-        Dir.chdir(settings.root) do
-          `#{env_var_str} bundle exec rspec --format json -o e2e-result.json spec/**/* 2>&1 | tee e2e-tests.log`
-        end
+      env_vars.merge!({"VERBOSE" => "true"}).keep_if{ |_,v| ![nil, ""].include?(v) }
+      env_vars_str = env_vars.map{ |k,v| "#{k}=#{v}" }.join(" ")
+      Dir.chdir(settings.root) do
+        pid = spawn(
+          "#{env_var_str} bundle exec rspec --format json -o e2e-result.json spec/**/*",
+          out: "e2e-tests.log",
+          err: "e2e-tests.log",
+        )
+        Process.detach(pid)
       end
     end
   end
