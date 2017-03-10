@@ -19,7 +19,7 @@ feature "Boostrap cluster" do
   end
 
   scenario "it creates a kubernetes cluster" do
-    visit "/nodes/index"
+    visit "/setup/discovery"
 
     dashboard_container = Container.new("velum-dashboard")
 
@@ -34,6 +34,10 @@ feature "Boostrap cluster" do
     expect(page).to have_content('minion0.k8s.local')
     expect(page).to have_content('minion1.k8s.local')
 
+    # Select master minion
+    within("div.nodes-container") do
+      first("input[type='radio']").click
+    end
     click_on 'Bootstrap cluster'
 
     # Wait until orchestration is complete
