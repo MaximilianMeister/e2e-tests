@@ -77,11 +77,11 @@ feature "Boostrap cluster" do
     expect(running_services).to eq(expected_services)
 
     # Sanity checks on the Kubernetes cluster.
-    out = master.command("kubectl cluster-info dump --output-directory=/opt/info")[:stdout]
-    expect(out).to eq "Cluster info dumped to /opt/info"
+    out = master.command("kubectl cluster-info dump --output-directory=/tmp/cluster_info")[:stdout]
+    expect(out).to eq "Cluster info dumped to /tmp/cluster_info"
 
     # One minion named after the k8s minion (minion0 or minion1)
-    nodes = JSON.parse(master.command("cat /opt/info/nodes.json")[:stdout])
+    nodes = JSON.parse(master.command("cat /tmp/cluster_info/nodes.json")[:stdout])
     expect(nodes["items"].first["metadata"]["name"]).to eq minion.command("hostname")[:stdout]
 
     # The pause image is there.

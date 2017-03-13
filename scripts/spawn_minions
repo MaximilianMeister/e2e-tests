@@ -20,4 +20,4 @@ cd $TERRAFORM_DIR
 default_interface=$(awk '$2 == 00000000 { print $1 }' /proc/net/route)
 ip_address=$(ip addr show $default_interface | awk '$1 == "inet" {print $2}' | cut -f1 -d/)
 
-SALT_DIR=$SALT_DIR PREFIX=e2e_tests DASHBOARD_HOST=$ip_address SKIP_DASHBOARD=1 FLAVOUR=opensuse MINIONS_SIZE=$1 contrib/libvirt/k8s-libvirt.sh apply
+SALT_DIR=$SALT_DIR PREFIX=e2e_tests DASHBOARD_HOST=$ip_address SKIP_DASHBOARD=1 FLAVOUR=caasp MINIONS_SIZE=$1 contrib/libvirt/k8s-libvirt.sh apply
