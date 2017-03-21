@@ -97,5 +97,28 @@ feature "Boostrap cluster" do
     flags = '--endpoints="http://minion1.k8s.local:2379,http://minion0.k8s.local:2379"'
     out = master.command("etcdctl #{flags} cluster-health")[:stdout]
     expect(out.include?("got healthy result")).to be_truthy
+
+    # Download kubeconfig and try to use it
+    # http://stackoverflow.com/a/17111206
+    data = page.evaluate_script("\
+      function() {
+        var url = window.location.protocol + '//' + window.location.host + '/kubectl-config';\
+        var xhr = new XMLHttpRequest();\
+        xhr.open('GET', url, false);\
+        xhr.send(null);\
+        return xhr.responseText;\
+      }()
+    ")
+
+    File.write("kubeconfig", data)
+    # Replace the master minion hostname with its ip in the kubeconfig file
+    # because we have no DNS running to resolve the hostname.
+    master_id = YAML.load(master.command("salt-call grains.get id")[:stdout])["local"]
+    system_command(command: "sed -i -- 's/#{master_id}/#{master.ip}/g' kubeconfig")
+
+    get_nodes_result =
+      system_command(command: "kubectl --kubeconfig=kubeconfig get nodes -o go-template='{{ range .items }}{{ .metadata.name }}{{ end }}'")[:stdout]
+
+    expect(get_nodes_result).to match(/minion\d+/)
   end
 end
