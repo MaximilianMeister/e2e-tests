@@ -8,6 +8,7 @@ feature "Boostrap cluster" do
 
     puts "Starting environment"
     start_environment
+    register
     login
     puts "Spawning minions"
     spawn_minions 2
