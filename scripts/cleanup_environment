@@ -7,3 +7,7 @@ cd $VELUM_DIR/kubernetes
 ./cleanup
 cd $SCRIPT_DIR
 ./stop_kubelet
+
+# Cleanup kuberentes tmp directory because sometimes we face this:
+# https://gihub.com/kubernetes/kubernetes/issues/38498
+sudo rm -rf $VELUM_DIR/kubernetes/tmp/*
