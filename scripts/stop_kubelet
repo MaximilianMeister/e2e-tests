@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-# Kill the kubelet which is started with a config file inside the working directory
+# Kill the kubelet
 # TODO: Remove sudo when we stop using sudo to lauch the kubelet
-sudo kill $(ps aux | grep kubelet | grep $PWD | awk '{print $2}')
+sudo killall -9 kubelet
