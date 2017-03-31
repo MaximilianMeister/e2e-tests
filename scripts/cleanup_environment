@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$(dirname $0)"
+pushd `dirname $0` > /dev/null
+SCRIPT_DIR=`pwd -P`
+popd > /dev/null
+
 source $SCRIPT_DIR/common
 
 cd $VELUM_DIR/kubernetes
