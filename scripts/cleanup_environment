@@ -8,6 +8,10 @@ source $SCRIPT_DIR/common
 
 cd $VELUM_DIR/kubernetes
 ./cleanup
+# if there is a change in the templates (e.g. filename) this will leave
+# the old manifests in place which leads to spawning unwanted pods
+# so clean them up
+rm -rf manifests/*
 cd $SCRIPT_DIR
 ./stop_kubelet
 
