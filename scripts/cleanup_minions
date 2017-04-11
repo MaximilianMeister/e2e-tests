@@ -43,6 +43,12 @@ do
   fi
 done
 
+# remove network bridges if they have not been cleaned up for some reason (aka terraform)
+for bridge in $(virsh net-info e2e_testsnet | grep Bridge | awk '{print $2}'); do
+  sudo ifconfig down $bridge || :
+  sudo brctl delbr $bridge || :
+done
+
 # Remove generated tf and tfstate files
 rm -f terraform.tfstate
 rm -f terraform.tfstate.backup
