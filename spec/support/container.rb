@@ -28,6 +28,7 @@ class Container
 
   def command(command, verbose: false)
     cmd_string = "docker exec #{container_id} #{command}"
+    puts ">>> #{cmd_string}"
     self.class.system_command(command: cmd_string, verbose: verbose)
   end
 end
