@@ -8,7 +8,6 @@ feature "Boostrap cluster" do
 
     puts "Starting environment"
     start_environment
-    login
     puts "Spawning minions"
     spawn_minions 2
   end
@@ -19,8 +18,6 @@ feature "Boostrap cluster" do
   end
 
   scenario "it creates a kubernetes cluster" do
-    visit "/setup/discovery"
-
     dashboard_container = Container.new("velum-dashboard")
 
     # Wait until Minions are registered
@@ -29,6 +26,11 @@ feature "Boostrap cluster" do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
     expect(minions_registered).to be(true)
+
+    # create test user
+    dashboard_container.command("rake db:seed")
+    login
+    visit "/setup/discovery"
 
     # They should also appear in the UI
     expect(page).to have_content('minion0.k8s.local')
