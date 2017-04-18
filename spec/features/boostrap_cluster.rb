@@ -32,9 +32,13 @@ feature "Boostrap cluster" do
     login
     visit "/setup/discovery"
 
-    # They should also appear in the UI
-    expect(page).to have_content('minion0.k8s.local')
-    expect(page).to have_content('minion1.k8s.local')
+    salt_container = Container.new("salt-master")
+    salt_container.command(
+      "salt '*' cmd.run 'cat /etc/machine-id' --out=text | grep -v 'ca:' | cut -d':' -f2"
+    )[:stdout].split.each do |hostname|
+      # They should also appear in the UI
+      expect(page).to have_content(hostname)
+    end
 
     # Select master minion
     within("div.nodes-container") do
