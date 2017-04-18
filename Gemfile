@@ -9,3 +9,6 @@ gem "poltergeist"
 gem "rack", "~> 1.6.5"
 gem "sinatra"
 gem "sinatra-contrib"
+
+gem "pry"
+gem "pry-nav"
