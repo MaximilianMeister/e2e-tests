@@ -44,7 +44,7 @@ do
 done
 
 # remove network bridges if they have not been cleaned up for some reason (aka terraform)
-for bridge in $(virsh net-info e2e_testsnet | grep Bridge | awk '{print $2}'); do
+for bridge in $(virsh net-info e2e_testsnet 2>/dev/null | grep Bridge | awk '{print $2}'); do
   sudo ifconfig down $bridge || :
   sudo brctl delbr $bridge || :
 done
