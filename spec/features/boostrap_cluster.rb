@@ -32,13 +32,9 @@ feature "Boostrap cluster" do
     login
     visit "/setup/discovery"
 
-    salt_container = Container.new("salt-master")
-    salt_container.command(
-      "salt '*' cmd.run 'cat /etc/machine-id' --out=text | grep -v 'ca:' | cut -d':' -f2"
-    )[:stdout].split.each do |hostname|
-      # They should also appear in the UI
-      expect(page).to have_content(hostname)
-    end
+    # They should also appear in the UI
+    expect(page).to have_content("minion0.k8s.local")
+    expect(page).to have_content("minion1.k8s.local")
 
     # Select master minion
     within("div.nodes-container") do
@@ -119,7 +115,7 @@ feature "Boostrap cluster" do
     File.write("kubeconfig", data)
     # Replace the master minion hostname with its ip in the kubeconfig file
     # because we have no DNS running to resolve the hostname.
-    master_id = YAML.load(master.command("salt-call grains.get id")[:stdout])["local"]
+    master_id = YAML.load(master.command("salt-call grains.get fqdn")[:stdout])["local"]
     system_command(command: "sed -i -- 's/#{master_id}/#{master.ip}/g' kubeconfig")
 
     get_nodes_result =
