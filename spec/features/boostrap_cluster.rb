@@ -8,6 +8,7 @@ feature "Boostrap cluster" do
 
     puts "Starting environment"
     start_environment
+    register
     puts "Spawning minions"
     spawn_minions 2
   end
@@ -27,9 +28,6 @@ feature "Boostrap cluster" do
     end
     expect(minions_registered).to be(true)
 
-    # create test user
-    dashboard_container.command("rake db:seed")
-    login
     visit "/setup/discovery"
 
     # They should also appear in the UI
