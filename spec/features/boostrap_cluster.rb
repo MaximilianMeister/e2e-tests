@@ -1,6 +1,7 @@
 require "spec_helper"
 
 feature "Boostrap cluster" do
+
   before do
     # In case something went wrong and we have leftovers
     puts "Cleaning up running minions"
@@ -19,6 +20,7 @@ feature "Boostrap cluster" do
   end
 
   scenario "it creates a kubernetes cluster" do
+
     dashboard_container = Container.new("velum-dashboard")
 
     # Wait until Minions are registered
@@ -114,11 +116,10 @@ feature "Boostrap cluster" do
     # Replace the master minion hostname with its ip in the kubeconfig file
     # because we have no DNS running to resolve the hostname.
     master_id = YAML.load(master.command("salt-call grains.get fqdn")[:stdout])["local"]
-    system_command(command: "sed -i -- 's/#{master_id}/#{master.ip}/g' kubeconfig")
-
+    system_command(command: "sed -i -- 's/server: https:\\\/\\\/.*:6443/server: https:\\\/\\\/#{master.ip}:6443/g' kubeconfig")
     get_nodes_result =
-      system_command(command: "kubectl --kubeconfig=kubeconfig get nodes -o go-template='{{ range .items }}{{ .metadata.name }}{{ end }}'")[:stdout]
+      system_command(command: "kubectl --kubeconfig=kubeconfig get nodes -o go-template='{{ range .items }}{{ range .status.conditions }}{{ if eq .reason \"KubeletReady\" }}{{ .status }}{{ end }}{{ end }}{{ end }}'")[:stdout]
 
-    expect(get_nodes_result).to match(/minion\d+/)
+    expect(get_nodes_result).to eq("True")
   end
 end
