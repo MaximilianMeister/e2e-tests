@@ -61,6 +61,10 @@ RSpec.configure do |config|
 
   # Set a timeout around the tests
   config.around(:each) do |test|
-    Timeout::timeout(460) { test.run }
+    begin
+      Timeout.timeout(460) { test.run }
+    rescue Timeout::Error
+      fail
+    end
   end
 end
