@@ -84,7 +84,7 @@ feature "Boostrap cluster" do
 
     # One minion named after the k8s minion (minion0 or minion1)
     nodes = JSON.parse(master.command("cat /tmp/cluster_info/nodes.json")[:stdout])
-    expect(nodes["items"].first["metadata"]["name"]).to eq minion.command("hostname")[:stdout]
+    expect(nodes["Items"].first["name"]).to eq minion.command("hostname")[:stdout]
 
     # The pause image is there.
     # TODO: depending whether it's opensuse or microos, this image will be available or not
