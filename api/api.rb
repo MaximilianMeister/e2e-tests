@@ -40,6 +40,7 @@ class RspecResultApi < Sinatra::Base
     env_vars["SALT_BRANCH"] = params["salt-branch"]
     env_vars["VELUM_BRANCH"] = params["velum-branch"]
     env_vars["TERRAFORM_BRANCH"] = params["terraform-branch"]
+    env_vars["CONTAINER_MANIFESTS_BRANCH"] = params["container-manifests-branch"]
 
     # if the json file doesn't exist initially
     run!(env_vars) && return unless result_file_path.exist?

@@ -19,8 +19,15 @@ else
   velum_branch=$VELUM_BRANCH
 fi
 
+if [ -z "${CONTAINER_MANIFESTS_BRANCH+x}" ]; then
+  container_manifests_branch=master
+else
+  container_manifests_branch=$CONTAINER_MANIFESTS_BRANCH
+fi
+
 fetch_repo 'https://github.com/kubic-project/salt.git' $salt_branch $SALT_DIR
 fetch_repo 'https://github.com/kubic-project/velum.git' $velum_branch $VELUM_DIR
+fetch_repo 'https://github.com/kubic-project/caasp-container-manifests' $container_manifests_branch $CONTAINER_MANIFESTS_DIR
 
 # Spawn the velum "development" environment (dashboard, salt-master,
 # salt-api, ca, etcd)
@@ -29,7 +36,7 @@ cd $VELUM_DIR/kubernetes
 # them with the "start" script
 ./cleanup
 # Daemonize this and loop until its ready
-SALT_DIR=$SALT_DIR ./start --non-interactive &
+CONTAINER_MANIFESTS_DIR=$CONTAINER_MANIFESTS_DIR SALT_DIR=$SALT_DIR ./start --non-interactive &
 cd $ROOT_DIR
 
 # Wait until the dashboard is up and running

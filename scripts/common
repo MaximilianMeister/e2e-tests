@@ -8,6 +8,7 @@ popd > /dev/null
 SALT_DIR=$ROOT_DIR/k8s-salt
 TERRAFORM_DIR=$ROOT_DIR/k8s-terraform
 VELUM_DIR=$ROOT_DIR/velum
+CONTAINER_MANIFESTS_DIR=$ROOT_DIR/caasp-container-manifests
 
 log()   { echo ">>> $1" ; }
 
