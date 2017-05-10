@@ -17,6 +17,10 @@ class RspecResultApi < Sinatra::Base
       Pathname.new(settings.root).join("e2e-tests.log")
     end
 
+    def container_log_path
+      Pathname.new(settings.root).join("containers.log")
+    end
+
     def json_result
       JSON.parse(result_file_path.read)
     end
@@ -64,6 +68,14 @@ class RspecResultApi < Sinatra::Base
   get "/logs" do
     if log_path.exist?
       send_file log_path
+    else
+      status 404
+    end
+  end
+
+  get "/containerlogs" do
+    if container_log_path.exist?
+      send_file container_log_path
     else
       status 404
     end
