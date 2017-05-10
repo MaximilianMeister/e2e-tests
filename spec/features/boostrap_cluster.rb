@@ -14,7 +14,8 @@ feature "Boostrap cluster" do
     spawn_minions 2
   end
 
-  after do
+  after do |example|
+    dump_container_logs if example.exception
     cleanup_environment
     cleanup_minions
   end
