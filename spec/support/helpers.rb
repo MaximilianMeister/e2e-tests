@@ -114,6 +114,18 @@ module Helpers
     click_on "Create Admin"
   end
 
+  def configure
+    visit "/setup"
+    fill_in "settings_dashboard", with: `hostname -f`
+    fill_in "settings_company_name", with: "SUSE LLC"
+    fill_in "settings_company_unit", with: "QA"
+    fill_in "settings_email", with: "containers@suse.de"
+    select  "Germany", from: "settings_country"
+    fill_in "settings_state", with: "Bavaria"
+    fill_in "settings_city", with: "Nuremberg"
+    click_on "Next"
+  end
+
   def dump_container_logs
     File.open(File.join(File.dirname(__FILE__), "../../", "containers.log"), "w") do |f|
       f.puts system_command(
