@@ -116,7 +116,7 @@ module Helpers
 
   def configure
     visit "/setup"
-    fill_in "settings_dashboard", with: `hostname -f`
+    fill_in "settings_dashboard", with: `hostname -f`.strip
     fill_in "settings_company_name", with: "SUSE LLC"
     fill_in "settings_company_unit", with: "QA"
     fill_in "settings_email", with: "containers@suse.de"
