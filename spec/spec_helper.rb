@@ -10,7 +10,8 @@ Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(
     app,
     js_errors:         false,
-    phantomjs_options: ["--load-images=no"]
+    phantomjs_options: ["--load-images=no"],
+    window_size:       [1920, 3000]
   )
 end
 
