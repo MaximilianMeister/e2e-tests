@@ -9,7 +9,10 @@ feature "Boostrap cluster" do
 
     puts "Starting environment"
     start_environment
+    puts "Registering user"
     register
+    puts "Setting up velum"
+    configure
     puts "Spawning minions"
     spawn_minions 2
   end
