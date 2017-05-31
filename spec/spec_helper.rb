@@ -61,9 +61,11 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   # Set a timeout around the tests
+  timeout = ENV.fetch('TEST_TIMEOUT', 460).to_i
+
   config.around(:each) do |test|
     begin
-      Timeout.timeout(460) { test.run }
+      Timeout::timeout(timeout) { test.run }
     rescue Timeout::Error
       fail
     end
