@@ -116,7 +116,9 @@ module Helpers
 
   def configure
     visit "/setup"
-    fill_in "settings_dashboard", with: `hostname -f`.strip
+    dashboard = system_command(command: "ip addr show $(awk '$2 == 00000000 { print $1 }' /proc/net/route) | awk '$1 == \"inet\" {print $2}' | cut -f1 -d/")[:stdout]
+    fill_in "settings_dashboard", with: dashboard
+    fill_in 'settings_apiserver', with: "localhost"
     fill_in "settings_company_name", with: "SUSE LLC"
     fill_in "settings_company_unit", with: "QA"
     fill_in "settings_email", with: "containers@suse.de"
