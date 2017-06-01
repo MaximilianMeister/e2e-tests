@@ -26,14 +26,12 @@ feature "Boostrap cluster" do
   scenario "it creates a kubernetes cluster" do
 
     dashboard_container = Container.new("velum-dashboard")
-
     # Wait until Minions are registered
     command = "rails runner 'ActiveRecord::Base.logger=nil; puts Minion.count'"
     minions_registered = loop_with_timeout(timeout: 15, interval: 1) do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
     expect(minions_registered).to be(true)
-
     visit "/setup/discovery"
 
     # They should also appear in the UI
@@ -86,10 +84,6 @@ feature "Boostrap cluster" do
     out = master.command("kubectl cluster-info dump --output-directory=/tmp/cluster_info")[:stdout]
     expect(out).to eq "Cluster info dumped to /tmp/cluster_info"
 
-    # One minion named after the k8s minion (minion0 or minion1)
-    nodes = JSON.parse(master.command("cat /tmp/cluster_info/nodes.json")[:stdout])
-    expect(nodes["Items"].first["name"]).to eq minion.command("hostname")[:stdout]
-
     # The pause image is there.
     # TODO: depending whether it's opensuse or microos, this image will be available or not
     #
@@ -100,7 +94,7 @@ feature "Boostrap cluster" do
     # expect(found).to be_truthy
 
     # Now let's check for etcd
-    flags = '--endpoints="http://minion1.k8s.local:2379,http://minion0.k8s.local:2379"'
+    flags = '--endpoints="http://127.0.0.1:2379"'
     out = master.command("etcdctl #{flags} cluster-health")[:stdout]
     expect(out.include?("got healthy result")).to be_truthy
 
