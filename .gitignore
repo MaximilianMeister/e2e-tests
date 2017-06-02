@@ -3,3 +3,5 @@ k8s-salt
 velum
 k8s-terraform
 caasp-container-manifests
+containers.log
+kubeconfig
