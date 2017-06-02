@@ -114,10 +114,17 @@ module Helpers
     click_on "Create Admin"
   end
 
+  def default_interface
+    `awk '$2 == 00000000 { print $1 }' /proc/net/route`.strip
+  end
+
+  def default_ip_address
+    `ip addr show #{default_interface} | awk '$1 == "inet" {print $2}' | cut -f1 -d/`.strip
+  end
+
   def configure
     visit "/setup"
-    dashboard = system_command(command: "ip addr show $(awk '$2 == 00000000 { print $1 }' /proc/net/route) | awk '$1 == \"inet\" {print $2}' | cut -f1 -d/")[:stdout]
-    fill_in "settings_dashboard", with: dashboard
+    fill_in "settings_dashboard", with: default_ip_address
     fill_in 'settings_apiserver', with: "localhost"
     fill_in "settings_company_name", with: "SUSE LLC"
     fill_in "settings_company_unit", with: "QA"
