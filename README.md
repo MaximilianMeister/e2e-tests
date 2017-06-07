@@ -30,18 +30,22 @@ After the tests are done there should be:
 
 ### Specifying branches
 
-For the end to end testing 3 git repositories are pulled:
+For the end to end testing 5 git repositories are pulled:
 
+- [caasp-devenv](https://github.com/kubic-project/caasp-devenv)
 - [velum](https://github.com/kubic-project/velum)
 - [k8s-salt](https://github.com/kubic-project/salt)
 - [k8s-terraform](https://github.com/kubic-project/terraform)
+- [caasp-container-manifests](https://github.com/kubic-project/caasp-container-manifests)
 
 Sometimes we need to specify a spefic branch for each one of them. That can be
 achieved by specifying the following environment variables:
 
-- VELUM_BRANCH: branch to use for velum
-- TERRAFORM_BRANCH: branch to use for k8s-terraform
-- SALT_BRANCH: branch to use for k8s-salt
+- CAASP_DEVENV_BRANCH: branch to use for `caasp-devenv`
+- VELUM_BRANCH: branch to use for `velum`
+- TERRAFORM_BRANCH: branch to use for `k8s-terraform`
+- SALT_BRANCH: branch to use for `k8s-salt`
+- CONTAINER_MANIFESTS_BRANCH: branch to use for `caasp-container-manifests`
 
 You can also define the branch through the sinatra api `/start` endpoint:
 

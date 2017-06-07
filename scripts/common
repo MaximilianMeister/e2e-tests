@@ -5,6 +5,7 @@ pushd `dirname $0` > /dev/null
 ROOT_DIR=$(dirname `pwd -P`)
 popd > /dev/null
 
+CAASP_DEVENV_DIR=$ROOT_DIR/caasp-devenv
 SALT_DIR=$ROOT_DIR/k8s-salt
 TERRAFORM_DIR=$ROOT_DIR/k8s-terraform
 VELUM_DIR=$ROOT_DIR/velum
