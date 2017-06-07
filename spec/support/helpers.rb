@@ -138,7 +138,7 @@ module Helpers
   def dump_container_logs
     File.open(File.join(File.dirname(__FILE__), "../../", "containers.log"), "w") do |f|
       f.puts system_command(
-        command: "for i in $(docker ps -a -q); do docker inspect $i && docker logs $i; done"
+        command: "for i in $(docker ps -a | egrep '(velum|salt|mariadb|etcd)' | awk '{print $1}'); do docker inspect $i && docker logs $i; done"
       )[:stdout]
     end
   end
