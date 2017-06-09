@@ -6,7 +6,7 @@ popd > /dev/null
 
 source $SCRIPT_DIR/common
 
-cd $VELUM_DIR/kubernetes
+cd $CAASP_DEVENV_DIR
 ./cleanup || :
 cd $SCRIPT_DIR
 ./stop_kubelet || :

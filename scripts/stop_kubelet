@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 # Kill the kubelet
-# TODO: Remove sudo when we stop using sudo to lauch the kubelet
+# TODO: Remove sudo when we stop using sudo to launch the kubelet
 sudo killall -9 kubelet

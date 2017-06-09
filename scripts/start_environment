@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
-# When SALT_BRANCH or VELUM_BRANCH environment variables are defined, they are
-# used as the branch to pull from k8s-salt and velum upstream repositories
-# accordingly. If they are not defined we use "master" by default.
+# When CAASP_DEVENV_BRANCH, SALT_BRANCH or VELUM_BRANCH environment variables
+# are defined, they are used as the branch to pull from caasp-devenv, salt
+# and velum upstream repositories accordingly. If they are not defined we
+# use "master" by default.
 
 SCRIPT_DIR="$(dirname $0)"
 source $SCRIPT_DIR/common
+
+if [ -z "${CAASP_DEVENV_BRANCH+x}" ]; then
+  caasp_devenv_branch=master
+else
+  caasp_devenv_branch=$CAASP_DEVENV_BRANCH
+fi
 
 if [ -z "${SALT_BRANCH+x}" ]; then
   salt_branch=master
@@ -25,18 +32,19 @@ else
   container_manifests_branch=$CONTAINER_MANIFESTS_BRANCH
 fi
 
+fetch_repo 'https://github.com/kubic-project/caasp-devenv.git' $caasp_devenv_branch $CAASP_DEVENV_DIR
 fetch_repo 'https://github.com/kubic-project/salt.git' $salt_branch $SALT_DIR
 fetch_repo 'https://github.com/kubic-project/velum.git' $velum_branch $VELUM_DIR
 fetch_repo 'https://github.com/kubic-project/caasp-container-manifests' $container_manifests_branch $CONTAINER_MANIFESTS_DIR
 
 # Spawn the velum "development" environment (dashboard, salt-master,
 # salt-api, ca, etcd)
-cd $VELUM_DIR/kubernetes
+cd $CAASP_DEVENV_DIR
 # Remove old containers or else the loop below will exit before we get to stop
 # them with the "start" script
 ./cleanup
 # Daemonize this and loop until its ready
-CONTAINER_MANIFESTS_DIR=$CONTAINER_MANIFESTS_DIR SALT_DIR=$SALT_DIR ./start --non-interactive &
+STAGING=devel VELUM_DIR=$VELUM_DIR CONTAINER_MANIFESTS_DIR=$CONTAINER_MANIFESTS_DIR SALT_DIR=$SALT_DIR ./start --non-interactive &
 cd $ROOT_DIR
 
 # Wait until the dashboard is up and running
@@ -60,7 +68,7 @@ do
   fi
 
   # found container. Lets see if it is running UPDATE queries (or else failing).
-  if [ $(docker logs $event_processor_id | grep UPDATE | wc -l) -gt 1 ]
+  if docker logs $event_processor_id | grep UPDATE
   then
     started=true
   else

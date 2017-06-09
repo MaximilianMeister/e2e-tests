@@ -19,7 +19,5 @@ fi
 fetch_repo 'https://github.com/kubic-project/terraform.git' $branch $TERRAFORM_DIR
 
 cd $TERRAFORM_DIR
-default_interface=$(awk '$2 == 00000000 { print $1 }' /proc/net/route)
-ip_address=$(ip addr show $default_interface | awk '$1 == "inet" {print $2}' | cut -f1 -d/)
 
-SALT_PATH=$SALT_DIR PREFIX=e2e_tests DASHBOARD_HOST=$ip_address SKIP_DASHBOARD=1 FLAVOUR=caasp MINIONS_SIZE=$1 LATEST_IMAGE=$LATEST_IMAGE contrib/libvirt/k8s-libvirt.sh apply
+SALT_PATH=$SALT_DIR PREFIX=e2e_tests SKIP_DASHBOARD=1 FLAVOUR=caasp MINIONS_SIZE=$1 LATEST_IMAGE=$LATEST_IMAGE contrib/libvirt/k8s-libvirt.sh apply

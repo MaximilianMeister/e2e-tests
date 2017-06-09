@@ -27,7 +27,7 @@ feature "Boostrap cluster" do
 
     dashboard_container = Container.new("velum-dashboard")
     # Wait until Minions are registered
-    command = "rails runner 'ActiveRecord::Base.logger=nil; puts Minion.count'"
+    command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts Minion.count'"
     minions_registered = loop_with_timeout(timeout: 15, interval: 1) do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
@@ -46,7 +46,7 @@ feature "Boostrap cluster" do
 
     # Wait until orchestration is complete
     query = "Minion.where(highstate: [Minion.highstates[:applied], Minion.highstates[:failed]]).count"
-    command = "rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
+    command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
     orchestration_completed = loop_with_timeout(timeout: 1500, interval: 1) do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
@@ -54,7 +54,7 @@ feature "Boostrap cluster" do
 
     # All Minions should have been applied the highstate successfully
     query = "Minion.where(highstate: Minion.highstates[:applied]).count"
-    command = "rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
+    command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
     expect(dashboard_container.command(command)[:stdout].to_i).to eq(2)
 
     minions = Minion.all
