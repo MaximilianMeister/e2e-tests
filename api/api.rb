@@ -47,10 +47,7 @@ class RspecResultApi < Sinatra::Base
     env_vars["CAASP_CONTAINER_MANIFESTS_BRANCH"] = params["caasp-container-manifests-branch"]
     env_vars["CAASP_DEVENV_BRANCH"] = params["caasp-devenv-branch"]
 
-    # if the json file doesn't exist initially
-    run!(env_vars) && return unless result_file_path.exist?
-    # return temporary unavailable if test is already running
-    result_file_path.size.zero? ? (status 503) : run!(env_vars)
+    run!(env_vars)
   end
 
   get '/result' do
