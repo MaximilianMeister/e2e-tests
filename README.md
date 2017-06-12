@@ -45,7 +45,7 @@ achieved by specifying the following environment variables:
 - VELUM_BRANCH: branch to use for `velum`
 - TERRAFORM_BRANCH: branch to use for `k8s-terraform`
 - SALT_BRANCH: branch to use for `k8s-salt`
-- CONTAINER_MANIFESTS_BRANCH: branch to use for `caasp-container-manifests`
+- CAASP_CONTAINER_MANIFESTS_BRANCH: branch to use for `caasp-container-manifests`
 
 You can also define the branch through the sinatra api `/start` endpoint:
 
