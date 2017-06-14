@@ -5,7 +5,7 @@ source $SCRIPT_DIR/common
 
 if [ -d "$TERRAFORM_DIR" ]; then
   cd $TERRAFORM_DIR
-  FORCE=true contrib/libvirt/k8s-libvirt.sh destroy
+  FORCE=true timeout 3m contrib/libvirt/k8s-libvirt.sh destroy
 fi
 
 # Manual cleanup (because sometimes the above leaves garbage behind)
