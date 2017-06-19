@@ -20,4 +20,4 @@ fetch_repo 'https://github.com/kubic-project/terraform.git' $branch $TERRAFORM_D
 
 cd $TERRAFORM_DIR
 
-SALT_PATH=$SALT_DIR PREFIX=e2e_tests SKIP_DASHBOARD=1 FLAVOUR=caasp MINIONS_SIZE=$1 LATEST_IMAGE=$LATEST_IMAGE contrib/libvirt/k8s-libvirt.sh apply
+SALT_PATH=$SALT_DIR PREFIX=e2e_tests SKIP_DASHBOARD=1 FLAVOUR=caasp MINIONS_SIZE=$1 LATEST_IMAGE=$LATEST_IMAGE timeout 15m contrib/libvirt/k8s-libvirt.sh apply
