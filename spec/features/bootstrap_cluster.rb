@@ -39,6 +39,7 @@ feature "Boostrap cluster" do
     expect(page).to have_content("minion1.k8s.local")
 
     # Select master minion
+    find(".check-all").click
     within("div.nodes-container") do
       first("input[type='radio']").click
     end
