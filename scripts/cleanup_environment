@@ -10,3 +10,8 @@ cd $CAASP_DEVENV_DIR
 ./cleanup || :
 cd $SCRIPT_DIR
 ./stop_kubelet || :
+
+# remove old docker development images
+for tag in 0.0 development; do
+  docker rmi -f sles12/velum:$tag
+done
