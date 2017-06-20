@@ -37,12 +37,12 @@ fetch_repo 'https://github.com/kubic-project/salt.git' $salt_branch $SALT_DIR
 fetch_repo 'https://github.com/kubic-project/velum.git' $velum_branch $VELUM_DIR
 fetch_repo 'https://github.com/kubic-project/caasp-container-manifests' $container_manifests_branch $CONTAINER_MANIFESTS_DIR
 
+# cleanup all old environment states from the last run
+$SCRIPT_DIR/cleanup_environment
+
 # Spawn the velum "development" environment (dashboard, salt-master,
 # salt-api, ca, etcd)
 cd $CAASP_DEVENV_DIR
-# Remove old containers or else the loop below will exit before we get to stop
-# them with the "start" script
-./cleanup
 # Daemonize this and loop until its ready
 STAGING=devel VELUM_DIR=$VELUM_DIR CONTAINER_MANIFESTS_DIR=$CONTAINER_MANIFESTS_DIR SALT_DIR=$SALT_DIR ./start --non-interactive &
 cd $ROOT_DIR
