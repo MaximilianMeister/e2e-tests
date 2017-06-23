@@ -95,7 +95,10 @@ feature "Boostrap cluster" do
     # expect(found).to be_truthy
 
     # Now let's check for etcd
-    flags = '--endpoints="http://127.0.0.1:2379"'
+    flags = '--ca-file /etc/pki/trust/anchors/SUSE_CaaSP_CA.crt'
+    flags += ' --key-file /etc/pki/minion.key'
+    flags += ' --cert-file /etc/pki/minion.crt'
+    flags += ' --endpoints="https://127.0.0.1:2379"'
     out = master.command("etcdctl #{flags} cluster-health")[:stdout]
     expect(out.include?("got healthy result")).to be_truthy
 
