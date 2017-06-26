@@ -45,6 +45,10 @@ feature "Boostrap cluster" do
     end
     click_on 'Bootstrap cluster'
 
+    # a modal with a warning will appear as we only have 2 nodes
+    expect(page).to have_content("Cluster is too small")
+    click_button "Proceed anyway"
+
     # Wait until orchestration is complete
     query = "Minion.where(highstate: [Minion.highstates[:applied], Minion.highstates[:failed]]).count"
     command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts #{query}'"
