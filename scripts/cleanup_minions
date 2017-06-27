@@ -8,9 +8,6 @@ if [ -d "$TERRAFORM_DIR" ]; then
   FORCE=true timeout 3m contrib/libvirt/k8s-libvirt.sh destroy
 fi
 
-# Manual cleanup (because sometimes the above leaves garbage behind)
-sudo -v # Get sudo access
-
 # Remove domains
 sudo virsh list --all | tail -n +3 | grep e2e_tests | awk '{print $2}' | while read domain
 do
