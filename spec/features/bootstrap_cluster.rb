@@ -1,4 +1,5 @@
 require "spec_helper"
+require 'yaml'
 
 feature "Boostrap cluster" do
 
@@ -26,9 +27,19 @@ feature "Boostrap cluster" do
   scenario "it creates a kubernetes cluster" do
 
     dashboard_container = Container.new("velum-dashboard")
+    salt_master_container = Container.new("salt-master")
+    # Wait until all minions are pending
+    command = "salt-key --list all --out yaml"
+    minions_pending = loop_with_timeout(timeout: 15, interval: 1) do
+        raw = salt_master_container.command(command)[:stdout]
+        minions = YAML.load raw
+        minions["minions_pre"].length == 2
+    end
+    visit "/setup/discovery"
+    find("#accept-all").click
     # Wait until Minions are registered
     command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts Minion.count'"
-    minions_registered = loop_with_timeout(timeout: 15, interval: 1) do
+    minions_registered = loop_with_timeout(timeout: 35, interval: 1) do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
     expect(minions_registered).to be(true)
