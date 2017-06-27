@@ -33,13 +33,20 @@ feature "Boostrap cluster" do
     salt_master_container = Container.new("salt-master")
     # Wait until all minions are pending
     command = "salt-key --list all --out yaml"
-    minions_pending = loop_with_timeout(timeout: 15, interval: 1) do
-        raw = salt_master_container.command(command)[:stdout]
-        minions = YAML.load raw
-        minions["minions_pre"].length == 2
+    loop_with_timeout(timeout: 15, interval: 1) do
+      raw = salt_master_container.command(command)[:stdout]
+      minions = YAML.load raw
+      minions["minions_pre"].length == 2
     end
     visit "/setup/discovery"
-    find("#accept-all").click
+    # Accept all nodes until all of them have been accepted
+    command = "salt-key --list all --out yaml"
+    loop_with_timeout(timeout: 60, interval: 1) do
+      find("#accept-all").click
+      raw = salt_master_container.command(command)[:stdout]
+      minions = YAML.load raw
+      minions["minions_pre"].empty?
+    end
     # Wait until Minions are registered
     command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts Minion.count'"
     minions_registered = loop_with_timeout(timeout: 35, interval: 1) do
