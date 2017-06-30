@@ -66,6 +66,9 @@ The available params are salt-branch, velum-branch and terraform-branch.
 You can enable verbose output by setting the `VERBOSE` env variable.
 E.g.  `VERBOSE=true rspec spec/**/*`
 
+If you want to keep an environment after the test finished set `KEEP`
+E.g.  `KEEP=true rspec spec/**/*`
+
 When you do, all the output from scripts will be output. Use this for debugging.
 
 ## TODO:

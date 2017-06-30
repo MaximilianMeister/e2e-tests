@@ -138,7 +138,21 @@ module Helpers
   def dump_container_logs
     File.open(File.join(File.dirname(__FILE__), "../../", "containers.log"), "w") do |f|
       f.puts system_command(
-        command: "for i in $(docker ps -a | egrep '(velum|salt|mariadb|etcd)' | awk '{print $1}'); do docker inspect $i && docker logs $i; done"
+        command: %Q{
+          for id in $(docker ps -a | egrep '(velum|salt|mariadb|etcd)' | awk '{print $1}'); do
+            name=$(docker ps -a --filter "id=$id" --format "{{.Names}}")
+            printf '=%.0s' {1..78}
+            echo "\n$name"
+            printf '=%.0s' {1..78}
+            echo
+            docker logs $id
+            if [[ "$name" =~ "velum-dashboard" ]]; then
+              echo "\n>>> SaltEvent logs:"
+              docker exec $id entrypoint.sh bundle exec rails runner 'puts(SaltEvent.all.map(&:parsed_data).to_yaml)'
+            fi
+            echo "\n\n"
+          done
+        }
       )[:stdout]
     end
   end

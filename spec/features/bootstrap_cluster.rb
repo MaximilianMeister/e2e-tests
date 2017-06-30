@@ -6,6 +6,7 @@ feature "Boostrap cluster" do
   before do
     # In case something went wrong and we have leftovers
     puts "Cleaning up running minions"
+    cleanup_environment
     cleanup_minions
 
     puts "Starting environment"
@@ -20,8 +21,10 @@ feature "Boostrap cluster" do
 
   after do |example|
     dump_container_logs if example.exception
-    cleanup_environment
-    cleanup_minions
+    unless ENV["KEEP"] do
+      cleanup_environment
+      cleanup_minions
+    end
   end
 
   scenario "it creates a kubernetes cluster" do
