@@ -49,7 +49,7 @@ feature "Boostrap cluster" do
     end
     # Wait until Minions are registered
     command = "entrypoint.sh rails runner 'ActiveRecord::Base.logger=nil; puts Minion.count'"
-    minions_registered = loop_with_timeout(timeout: 35, interval: 1) do
+    minions_registered = loop_with_timeout(timeout: 120, interval: 1) do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
     expect(minions_registered).to be(true)
