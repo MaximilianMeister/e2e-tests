@@ -21,7 +21,7 @@ feature "Boostrap cluster" do
 
   after do |example|
     dump_container_logs if example.exception
-    unless ENV["KEEP"] do
+    unless ENV["KEEP"]
       cleanup_environment
       cleanup_minions
     end
