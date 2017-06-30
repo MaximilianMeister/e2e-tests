@@ -126,12 +126,6 @@ module Helpers
     visit "/setup"
     fill_in "settings_dashboard", with: default_ip_address
     fill_in 'settings_apiserver', with: "localhost"
-    fill_in "settings_company_name", with: "SUSE LLC"
-    fill_in "settings_company_unit", with: "QA"
-    fill_in "settings_email", with: "containers@suse.de"
-    select  "Germany", from: "settings_country"
-    fill_in "settings_state", with: "Bavaria"
-    fill_in "settings_city", with: "Nuremberg"
     click_on "Next"
   end
 
