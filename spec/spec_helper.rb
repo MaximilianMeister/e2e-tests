@@ -7,18 +7,24 @@ Dir[File.join(File.dirname(File.dirname(__FILE__)), "spec", "support", "**", "*.
   each { |f| require f }
 
 Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(
-    app,
+  options = {
+    timeout:           180,
     js_errors:         false,
-    phantomjs_options: ["--load-images=no"],
-    window_size:       [1920, 3000]
-  )
+    phantomjs_options: [
+      "--proxy-type=none",
+      "--load-images=no"
+    ]
+  }
+  # NOTE: uncomment the line below to get more info on the current run.
+  # options[:debug] = true
+  Capybara::Poltergeist::Driver.new(app, options)
 end
 
 Capybara.current_driver = :poltergeist
 
 Capybara.configure do |config|
-  config.default_max_wait_time = 5
+  config.javascript_driver = :poltergeist
+  config.default_max_wait_time = 20
   config.match = :one
   config.exact_options = true
   config.ignore_hidden_elements = true
