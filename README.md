@@ -61,6 +61,16 @@ curl -X POST http://localhost:4567/start --data "velum-branch=pull/56/head"
 
 The available params are salt-branch, velum-branch and terraform-branch.
 
+## Other flags
+
+You can provide other environment variables that will modify the behaviour of the end to end tests.
+Allowed flags:
+
+- SKIP_VELUM_IMAGE_CLEANUP: by default the velum image is rebuilt on every run for extra
+  safety. While being useful in some environments (e2e-tests in our infrastructure), it
+  might be overkill under some situations, making this process slower. Set this environment
+  variable and the velum image will only be recreated if necessary.
+
 ## Output
 
 You can enable verbose output by setting the `VERBOSE` env variable.

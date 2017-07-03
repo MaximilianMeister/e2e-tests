@@ -12,6 +12,8 @@ cd $SCRIPT_DIR
 ./stop_kubelet || :
 
 # remove old docker development images
-for tag in 0.0 development; do
-  docker rmi -f sles12/velum:$tag
-done
+if [ -z $SKIP_VELUM_IMAGE_CLEANUP ]; then
+    for tag in 0.0 development; do
+        docker rmi -f sles12/velum:$tag
+    done
+fi
