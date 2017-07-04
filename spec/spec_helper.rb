@@ -26,7 +26,7 @@ Capybara.configure do |config|
   config.default_selector = :css
 
   # TODO: Don't hardcode this
-  config.app_host = "http://127.0.0.1:3000"
+  config.app_host = "https://localhost"
 end
 
 RSpec.configure do |config|
