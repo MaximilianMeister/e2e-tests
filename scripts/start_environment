@@ -48,7 +48,7 @@ STAGING=devel VELUM_DIR=$VELUM_DIR CONTAINER_MANIFESTS_DIR=$CONTAINER_MANIFESTS_
 cd $ROOT_DIR
 
 # Wait until the dashboard is up and running
-until $(curl -s http://127.0.0.1:3000/ | grep -q "Log in")
+until $(curl -k -s https://localhost/ | grep -q "Log in")
 do
   log "Waiting for velum to start"
   sleep 5
