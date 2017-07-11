@@ -1,46 +1,15 @@
 # A module containing helper methods to create a testing environment
 # for end to end tests.
 module Helpers
-  # Spawns salt-minions which connect to velum.
-  # The minion is a Virtual Machine which we build using terraform.
-  def spawn_minions(number_of_minions, verbose: false)
-    system_command(
-      command: "#{File.join(scripts_path, "spawn_minions")} #{number_of_minions.to_i}",
-      verbose: verbose
-    )
-  end
-
-  def cleanup_minions(verbose: false)
-    system_command(command: "#{File.join(scripts_path, "cleanup_minions")}", verbose: verbose)
-  end
-
-  # Runs the script that creates the testing environment
-  def start_environment(verbose: false)
-    system_command(command: "#{File.join(scripts_path, "start_environment")}", verbose: verbose)
-  end
-
-  def cleanup_environment(verbose: false)
-    system_command(
-      command: "#{File.join(scripts_path, "cleanup_environment")}",
-      verbose: verbose
-    )
-  end
-
-  def scripts_path
-    script = File.join(
-      File.dirname(File.dirname(File.dirname(__FILE__))),
-      "scripts",
-    )
-  end
-
   # https://nickcharlton.net/posts/ruby-subprocesses-with-stdout-stderr-streams.html
   # see: http://stackoverflow.com/a/1162850/83386
-  def system_command(command:, verbose: false)
+  def system_command(command:, verbose: false, host: "localhost")
     start_time_at = Time.now
     stdout_data = ''
     stderr_data = ''
     exit_code = nil
     threads = []
+    command = "echo \"#{command}\" | ssh -q -o 'StrictHostKeyChecking no' root@#{host}" if host != "localhost"
 
     Open3.popen3(ENV, command) do |stdin, stdout, stderr, thread|
       [[stdout_data, stdout], [stderr_data, stderr]].each do |store_var, stream|
@@ -124,31 +93,9 @@ module Helpers
 
   def configure
     visit "/setup"
-    fill_in "settings_dashboard", with: default_ip_address
-    fill_in 'settings_apiserver', with: "localhost"
+    fill_in "settings_dashboard", with: ENV.fetch("DASHBOARD_HOST", default_ip_address)
+    fill_in 'settings_apiserver', with: ENV.fetch("KUBERNETES_HOST", "localhost")
     click_on "Next"
-  end
-
-  def dump_container_logs
-    File.open(File.join(File.dirname(__FILE__), "../../", "containers.log"), "w") do |f|
-      f.puts system_command(
-        command: %Q{
-          for id in $(docker ps -a | egrep '(velum|salt|mariadb|etcd)' | awk '{print $1}'); do
-            name=$(docker ps -a --filter "id=$id" --format "{{.Names}}")
-            printf '=%.0s' {1..78}
-            echo "\n$name"
-            printf '=%.0s' {1..78}
-            echo
-            docker logs $id
-            if [[ "$name" =~ "velum-dashboard" ]]; then
-              echo "\n>>> SaltEvent logs:"
-              docker exec $id entrypoint.sh bundle exec rails runner 'puts(SaltEvent.all.map(&:parsed_data).to_yaml)'
-            fi
-            echo "\n\n"
-          done
-        }
-      )[:stdout]
-    end
   end
 end
 

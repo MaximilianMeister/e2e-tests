@@ -32,7 +32,7 @@ Capybara.configure do |config|
   config.default_selector = :css
 
   # TODO: Don't hardcode this
-  config.app_host = "https://localhost"
+  config.app_host = "https://#{ENV.fetch('DASHBOARD_HOST', 'localhost')}"
 end
 
 RSpec.configure do |config|

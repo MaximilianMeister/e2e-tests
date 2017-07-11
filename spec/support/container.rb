@@ -22,13 +22,13 @@ class Container
 
   # Returns the container id matching the name_matching_string
   def container_id
-    command = "docker  ps | grep #{name_matching_string} | head -n 1 | awk '{print $1}'"
-    self.class.system_command(command: command)[:stdout]
+    command = "docker ps | grep #{name_matching_string} | head -n 1 | awk '{print \\$1}'"
+    self.class.system_command(command: command, host: ENV.fetch("DASHBOARD_HOST", "localhost"))[:stdout]
   end
 
   def command(command, verbose: false)
     cmd_string = "docker exec #{container_id} #{command}"
     puts ">>> #{cmd_string}"
-    self.class.system_command(command: cmd_string, verbose: verbose)
+    self.class.system_command(command: cmd_string, verbose: verbose, host: ENV.fetch("DASHBOARD_HOST", "localhost"))
   end
 end
