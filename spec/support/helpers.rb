@@ -3,13 +3,17 @@
 module Helpers
   # https://nickcharlton.net/posts/ruby-subprocesses-with-stdout-stderr-streams.html
   # see: http://stackoverflow.com/a/1162850/83386
-  def system_command(command:, verbose: false, host: "localhost")
+  def system_command(command:, verbose: false, host: "localhost", ssh_key_path: nil)
     start_time_at = Time.now
     stdout_data = ''
     stderr_data = ''
     exit_code = nil
     threads = []
-    command = "echo \"#{command}\" | ssh -q -o 'StrictHostKeyChecking no' root@#{host}" if host != "localhost"
+    ssh_flags = "-q -o 'StrictHostKeyChecking no' -o UserKnownHostsFile=/dev/null"
+    ssh_key_path = ENV.fetch('SSH_KEY_PATH', ssh_key_path)
+    ssh_flags << " -i #{ssh_key_path}" if ssh_key_path
+    # echo and | are necessary not to lose quotes of nested command arguments
+    command = "echo \"#{command}\" | ssh #{ssh_flags} root@#{host}" unless host == "localhost"
 
     Open3.popen3(ENV, command) do |stdin, stdout, stderr, thread|
       [[stdout_data, stdout], [stderr_data, stderr]].each do |store_var, stream|
