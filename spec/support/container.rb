@@ -22,7 +22,9 @@ class Container
 
   # Returns the container id matching the name_matching_string
   def container_id
-    command = "docker ps | grep #{name_matching_string} | head -n 1 | awk '{print \\$1}'"
+    # necessary that $1 will not be interpreted with remote ssh command
+    awk_args = ENV.fetch("DASHBOARD_HOST", nil) ? "{print \\$1}" : "{print $1}"
+    command = "docker ps | grep #{name_matching_string} | head -n 1 | awk '#{awk_args}'"
     self.class.system_command(command: command, host: ENV.fetch("DASHBOARD_HOST", "localhost"))[:stdout]
   end
 

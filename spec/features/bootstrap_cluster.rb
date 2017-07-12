@@ -36,7 +36,15 @@ feature "Boostrap cluster" do
       dashboard_container.command(command)[:stdout].to_i == 2
     end
     expect(minions_registered).to be(true)
-    visit "/setup/discovery"
+    puts ">>> Minions registered"
+
+    # Wait until Minions are accepted
+    minions_accepted = loop_with_timeout(timeout: 120, interval: 5) do
+      puts ">>> Waiting for nodes to be accepted"
+      first("h3").text == "2 nodes found"
+    end
+    expect(minions_accepted).to be(true)
+    puts ">>> Nodes accepted"
 
     # They should also appear in the UI
     expect(page).to have_content("minion0.k8s.local")
