@@ -66,6 +66,9 @@ RSpec.configure do |config|
   # triggering implicit auto-inclusion in groups with matching metadata.
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
+  # fail fast
+  config.fail_fast = true
+
   # Set a timeout around the tests
   timeout = ENV.fetch('TEST_TIMEOUT', 2200).to_i
 

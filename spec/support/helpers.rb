@@ -55,7 +55,7 @@ module Helpers
   def loop_with_timeout(timeout:, interval: 1, &block)
     start_time = Time.now
     loop do
-      return false if Time.now - start_time > timeout
+      fail("Timed out") if Time.now - start_time > timeout
       return true if yield
       sleep interval
     end
@@ -74,18 +74,22 @@ module Helpers
   end
 
   def login
+    puts ">>> User logs in"
     visit "/users/sign_in"
     fill_in "user_email", with: "test@test.com"
     fill_in "user_password", with: "password"
     click_on "Log in"
+    puts ">>> User logged in"
   end
 
   def register
+    puts ">>> Registering user"
     visit "/users/sign_up"
     fill_in "user_email", with: "test@test.com"
     fill_in "user_password", with: "password"
     fill_in "user_password_confirmation", with: "password"
     click_on "Create Admin"
+    puts ">>> User registered"
   end
 
   def default_interface
@@ -97,10 +101,12 @@ module Helpers
   end
 
   def configure
+    puts ">>> Setting up velum"
     visit "/setup"
     fill_in "settings_dashboard", with: ENV.fetch("DASHBOARD_HOST", default_ip_address)
     fill_in 'settings_apiserver', with: ENV.fetch("KUBERNETES_HOST", "localhost")
     click_on "Next"
+    puts ">>> Velum set up"
   end
 end
 
