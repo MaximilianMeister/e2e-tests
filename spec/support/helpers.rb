@@ -57,6 +57,7 @@ module Helpers
     loop do
       return false if Time.now - start_time > timeout
       return true if yield
+      sleep interval
     end
   end
 
