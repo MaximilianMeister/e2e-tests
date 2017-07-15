@@ -79,7 +79,7 @@ module Helpers
     fill_in "user_email", with: "test@test.com"
     fill_in "user_password", with: "password"
     click_on "Log in"
-    puts ">>> User logged in"
+    puts "<<< User logged in"
   end
 
   def register
@@ -89,7 +89,7 @@ module Helpers
     fill_in "user_password", with: "password"
     fill_in "user_password_confirmation", with: "password"
     click_on "Create Admin"
-    puts ">>> User registered"
+    puts "<<< User registered"
   end
 
   def default_interface
@@ -106,7 +106,7 @@ module Helpers
     fill_in "settings_dashboard", with: ENV.fetch("DASHBOARD_HOST", default_ip_address)
     fill_in 'settings_apiserver', with: ENV.fetch("KUBERNETES_HOST", "localhost")
     click_on "Next"
-    puts ">>> Velum set up"
+    puts "<<< Velum set up"
   end
 end
 

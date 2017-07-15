@@ -41,7 +41,7 @@ feature "Boostrap cluster" do
       minions = YAML.load(salt_master_container.command(list_salt_keys_command)[:stdout])
       minions["minions_pre"].length == node_number
     end
-    puts ">>> All minions are pending to be accepted"
+    puts "<<< All minions are pending to be accepted"
 
     puts ">>> Click to accept all minion keys"
     loop_with_timeout(timeout: 120, interval: 20) do
@@ -55,21 +55,21 @@ feature "Boostrap cluster" do
       minions = YAML.load raw
       minions["minions_pre"].empty?
     end
-    puts ">>> Minion keys accepted by salt"
+    puts "<<< Minion keys accepted by salt"
 
     puts ">>> Waiting until Minions are accepted in Velum"
     minions_accepted = loop_with_timeout(timeout: 120, interval: 5) do
       !page.has_content?("Acceptance in progress") && first("h3").text == "#{node_number} nodes found"
     end
     expect(minions_accepted).to be(true)
-    puts ">>> Minions accepted in Velum"
+    puts "<<< Minions accepted in Velum"
 
     puts ">>> Wait until Minions are registered in the Velum database"
     minions_registered = loop_with_timeout(timeout: 120, interval: 5) do
       dashboard_container.command(minion_count_command)[:stdout].to_i == node_number
     end
     expect(minions_registered).to be(true)
-    puts ">>> Minions registered in the Velum database"
+    puts "<<< Minions registered in the Velum database"
 
     # They should also appear in the UI
     hostnames.each do |hostname|
@@ -82,13 +82,13 @@ feature "Boostrap cluster" do
 
     puts ">>> Selecting all minions"
     find(".check-all").click
-    puts ">>> All minions selected"
+    puts "<<< All minions selected"
 
     puts ">>> Selecting master minion"
     within("div.nodes-container") do
       first("input[type='radio']").click
     end
-    puts ">>> Master minion selected"
+    puts "<<< Master minion selected"
 
     puts ">>> Bootstrapping cluster"
     click_on 'Bootstrap cluster'
@@ -98,14 +98,14 @@ feature "Boostrap cluster" do
       expect(page).to have_content("Cluster is too small")
       click_button "Proceed anyway"
     end
-    puts ">>> Cluster bootstrapped"
+    puts "<<< Cluster bootstrapped"
 
     puts ">>> Wait until orchestration is complete"
     orchestration_completed = loop_with_timeout(timeout: 1500, interval: 5) do
       dashboard_container.command(orchestration_check_command)[:stdout].to_i == node_number
     end
     expect(orchestration_completed).to be(true)
-    puts ">>> Orchestration completed"
+    puts "<<< Orchestration completed"
 
     # All Minions should have been applied the highstate successfully
     puts ">>> Checking highstate"
