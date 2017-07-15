@@ -56,7 +56,7 @@ module Helpers
     start_time = Time.now
     loop do
       fail("Timed out") if Time.now - start_time > timeout
-      return true if yield
+      return true if yield == true
       sleep interval
     end
   end

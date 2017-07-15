@@ -4,6 +4,7 @@ require 'yaml'
 feature "Boostrap cluster" do
 
   let(:node_number) { ENV.fetch("NODE_NUMBER", 2).to_i }
+  let(:hostnames) { ENV.fetch("HOSTNAMES", node_number.times.map { |n| "minion#{n}.k8s.local" }.join(",")).split(",") }
   let(:dashboard_container) { Container.new("velum-dashboard") }
   let(:salt_master_container) { Container.new("salt-master") }
   let(:list_salt_keys_command) { "salt-key --list all --out yaml" }
@@ -37,43 +38,43 @@ feature "Boostrap cluster" do
 
     puts ">>> Wait until all minions are pending to be accepted"
     loop_with_timeout(timeout: 60, interval: 5) do
-      raw = salt_master_container.command(list_salt_keys_command)[:stdout]
-      minions = YAML.load raw
+      minions = YAML.load(salt_master_container.command(list_salt_keys_command)[:stdout])
       minions["minions_pre"].length == node_number
     end
     puts ">>> All minions are pending to be accepted"
 
-    puts ">>> Accept all minions"
-    loop_with_timeout(timeout: 60, interval: 20) do
+    puts ">>> Click to accept all minion keys"
+    loop_with_timeout(timeout: 120, interval: 20) do
+      break if page.has_content?("#{node_number} nodes found")
       find("#accept-all").click rescue false
     end
-    puts ">>> All minions accepted"
 
-    puts ">>> Wait until nodes are accepted"
+    puts ">>> Wait until Minion keys are accepted by salt"
     loop_with_timeout(timeout: 60, interval: 5) do
       raw = salt_master_container.command(list_salt_keys_command)[:stdout]
       minions = YAML.load raw
       minions["minions_pre"].empty?
     end
-    puts ">>> Nodes accepted"
+    puts ">>> Minion keys accepted by salt"
 
-    puts ">>> Wait until Minions are registered"
-    minions_registered = loop_with_timeout(timeout: 120, interval: 5) do
-      dashboard_container.command(minion_count_command)[:stdout].to_i == node_number
-    end
-    expect(minions_registered).to be(true)
-    puts ">>> Minions registered"
-
-    puts ">>> Waiting until Minions are accepted"
+    puts ">>> Waiting until Minions are accepted in Velum"
     minions_accepted = loop_with_timeout(timeout: 120, interval: 5) do
       !page.has_content?("Acceptance in progress") && first("h3").text == "#{node_number} nodes found"
     end
     expect(minions_accepted).to be(true)
-    puts ">>> Minions accepted"
+    puts ">>> Minions accepted in Velum"
+
+    puts ">>> Wait until Minions are registered in the Velum database"
+    minions_registered = loop_with_timeout(timeout: 120, interval: 5) do
+      dashboard_container.command(minion_count_command)[:stdout].to_i == node_number
+    end
+    expect(minions_registered).to be(true)
+    puts ">>> Minions registered in the Velum database"
 
     # They should also appear in the UI
-    expect(page).to have_content("minion0.k8s.local")
-    expect(page).to have_content("minion1.k8s.local")
+    hostnames.each do |hostname|
+      expect(page).to have_content(hostname)
+    end
   end
 
   scenario "User selects a master and bootstraps the cluster" do
