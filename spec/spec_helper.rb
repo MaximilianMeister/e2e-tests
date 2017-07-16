@@ -1,10 +1,24 @@
 # frozen_string_literal: true
+require "json"
 require "capybara/rspec"
 require "capybara/poltergeist"
 
 # Automatically require all files in spec/support directory
 Dir[File.join(File.dirname(File.dirname(__FILE__)), "spec", "support", "**", "*.rb")].
   each { |f| require f }
+
+def environment
+  env = JSON.parse(File.read(ENV.fetch("ENVIRONMENT", "#{File.join(File.dirname(__FILE__), '../../')}terraform/environment.json")))
+  abort("Please specify kubernetesHost in environment.json") unless env["kubernetesHost"]
+  abort("Please specify at least 2 minions in environment.json") if env["minions"].count < 2
+  # if run against a caasp-devenv we need to clear dashboardHost parameters
+  return env unless ENV.fetch("DEVENV")
+  env.tap { |h| h.delete("dashboardHost"); h.delete("sshKey") }
+rescue JSON::ParserError
+  fail("Invalid JSON format")
+rescue
+  fail("Please specify ENVIRONMENT to point to a valid environment.json path")
+end
 
 Capybara.register_driver :poltergeist do |app|
   options = {
@@ -31,8 +45,7 @@ Capybara.configure do |config|
   config.visible_text_only = true
   config.default_selector = :css
 
-  # TODO: Don't hardcode this
-  config.app_host = "https://#{ENV.fetch('DASHBOARD_HOST', 'localhost')}"
+  config.app_host = "https://#{environment['dashboardHost'] || 'localhost'}"
 end
 
 RSpec.configure do |config|

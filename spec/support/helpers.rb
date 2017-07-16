@@ -10,7 +10,7 @@ module Helpers
     exit_code = nil
     threads = []
     ssh_flags = "-q -o 'StrictHostKeyChecking no' -o UserKnownHostsFile=/dev/null"
-    ssh_key_path = ENV.fetch('SSH_KEY_PATH', ssh_key_path)
+    ssh_key_path = environment["sshKey"] || ssh_key_path
     ssh_flags << " -i #{ssh_key_path}" if ssh_key_path
     # echo and | are necessary not to lose quotes of nested command arguments
     command = "echo \"#{command}\" | ssh #{ssh_flags} root@#{host}" unless host == "localhost"
@@ -52,7 +52,7 @@ module Helpers
   #
   # The method return false if the timeout is reached or the block never returns
   # true.
-  def loop_with_timeout(timeout:, interval: 1, &block)
+  def wait_for(timeout:, interval: 1, &block)
     start_time = Time.now
     loop do
       fail("Timed out") if Time.now - start_time > timeout
@@ -103,8 +103,8 @@ module Helpers
   def configure
     puts ">>> Setting up velum"
     visit "/setup"
-    fill_in "settings_dashboard", with: ENV.fetch("DASHBOARD_HOST", default_ip_address)
-    fill_in 'settings_apiserver', with: ENV.fetch("KUBERNETES_HOST", "localhost")
+    fill_in "settings_dashboard", with: environment["dashboardHost"] || default_ip_address
+    fill_in "settings_apiserver", with: environment["kubernetesHost"]
     click_on "Next"
     puts "<<< Velum set up"
   end
